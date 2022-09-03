@@ -37,6 +37,102 @@ class TriviaTestCase(unittest.TestCase):
     Write at least one test for each test for successful operation and for expected errors.
     """
 
+    def test_404_requesting_beyond_valid_page(self):
+        res = self.client().get('/questions?page=1000', json={'difficulty': 1})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Resource Not Found')
+
+    def test_get_paginated_questions(self):
+        res = self.client().get('/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertTrue(len(data['questions']))
+
+    def test_delete_question(self):
+        question = Question(question='new question', answer='new answer',
+                            difficulty=1, category=1)
+        question.insert()
+        question_id = question.id
+
+        res = self.client().delete(f'/questions/{question_id}')
+        data = json.loads(res.data)
+
+        question = Question.query.filter(
+            Question.id == question.id).one_or_none()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], str(question_id))
+        self.assertEqual(question, None)
+
+    def test_422_sent_deleting_non_existing_question(self):
+        res = self.client().delete('/questions/a')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'unprocessable')
+
+    def test_add_question(self):
+        new_question = {
+            'question': 'new question',
+            'answer': 'new answer',
+            'difficulty': 1,
+            'category': 1
+        }
+        total_questions_before = len(Question.query.all())
+        res = self.client().post('/questions', json=new_question)
+        data = json.loads(res.data)
+        total_questions_after = len(Question.query.all())
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertEqual(total_questions_after, total_questions_before + 1)
+
+    def test_422_if_question_to_delete_does_not_exist(self):
+        res = self.client().delete('/questions/1000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Not Processable')
+
+    def test_search_question(self):
+        res = self.client().post('/questions', json={'searchTerm': 'question'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['questions'])
+        self.assertEqual(len(data['questions']), 10)
+
+    def test_get_quiz(self):
+        res = self.client().post('/quizzes', json=
+        {'previous_questions': [],
+         'quiz_category':
+        {'id': '5', 'type': 'Entertainment'}})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['question'])
+        self.assertEqual(data['question']['category'], 5)
+
+    def test_422_get_quiz(self):
+        res = self.client().post('/quizzes', json=
+        {
+            'previous_questions': []
+        })
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Not Processable')
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
