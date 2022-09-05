@@ -3,6 +3,9 @@ from sqlalchemy import Column, String, Integer, create_engine
 from flask_sqlalchemy import SQLAlchemy
 import json
 
+# Turning on debug mode
+# DEBUG = True
+
 database_name = 'trivia'
 # database_path = 'postgresql://{}/{}'.format('localhost:5432', database_name)
 database_path = "postgresql://postgres@localhost:5432/trivia"
@@ -33,11 +36,14 @@ class Question(db.Model):
     category = Column(String)
     difficulty = Column(Integer)
 
+
     def __init__(self, question, answer, category, difficulty):
         self.question = question
         self.answer = answer
         self.category = category
         self.difficulty = difficulty
+
+    # additional methods
 
     def insert(self):
         db.session.add(self)
