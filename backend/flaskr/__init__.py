@@ -6,7 +6,7 @@ from flask_cors import CORS
 import random
 from ..models import setup_db, Question, Category, db
 
-# setting questions per page to allow variation
+# setting questions per page parameter to allow for variation
 PAGINATED_QUESTIONS_PER_PAGE = 10
 
 #creating a helper method to paginate questions and improve user experience.
