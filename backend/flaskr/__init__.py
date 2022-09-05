@@ -289,7 +289,7 @@ def create_app(test_config=None):
                 # retrieving questions and excluding the previous question
                 available_questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
                 # randomizing the new question bank/ collection
-                question_bank = random.randrange(available_questions, len(available_questions))
+                question_bank = random.randrange(available_questions[0], len(available_questions))
                 # setting the current question
                 current_question = question_bank
                 # separating questions that have been answered
