@@ -107,7 +107,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['questions'])
         self.assertEqual(len(data['questions']), 10)
 
-    def test_get_quiz(self):
+    # testing
+    def test_quiz_time(self):
         res = self.client().post('/quizzes', json=
         {'previous_questions': [],
          'quiz_category':
@@ -118,6 +119,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['question'])
         self.assertEqual(data['question']['category'], 5)
 
+    # testing 422 error
     def test_422_get_quiz(self):
         res = self.client().post('/quizzes', json=
         {
@@ -130,6 +132,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'Not Processable')
 
 
-# Make the tests conveniently executable
+# Tests are executed here
 if __name__ == "__main__":
     unittest.main()
