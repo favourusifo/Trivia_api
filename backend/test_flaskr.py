@@ -32,13 +32,9 @@ class TriviaTestCase(unittest.TestCase):
         """Executed after reach test"""
         pass
 
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
 
-    def test_404_requesting_beyond_valid_page(self):
-        res = self.client().get('/questions?page=1000', json={'difficulty': 1})
+    def test_404_request_exceeds_valid_page(self):
+        res = self.client().get('/questions?page=2000', json={'difficulty': 2})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
@@ -71,20 +67,20 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['deleted'], str(question_id))
         self.assertEqual(question, None)
 
-    def test_422_sent_deleting_non_existing_question(self):
-        res = self.client().delete('/questions/a')
+    def test_delete_question(self):
+        res = self.client().delete("/questions/5")
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'unprocessable')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertEqual(data["question_id"], 5)
 
     def test_add_question(self):
         new_question = {
             'question': 'new question',
             'answer': 'new answer',
-            'difficulty': 1,
-            'category': 1
+            'difficulty': 2,
+            'category': 2
         }
         total_questions_before = len(Question.query.all())
         res = self.client().post('/questions', json=new_question)
